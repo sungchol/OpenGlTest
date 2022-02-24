@@ -1,10 +1,12 @@
 package jade;
 
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 
 import components.Sprite;
 import components.SpriteRenderer;
 import components.Spritesheet;
+import imgui.ImGui;
 import renderer.Texture;
 import util.AssetPool;
 
@@ -44,8 +46,9 @@ public class LevelEditorScene extends Scene {
 		
 		obj1 = new GameObject("Object 1", 
 							new Transform(new Vector2f(100,100), new Vector2f(256, 256)), 2);
-		obj1.addComponent(new SpriteRenderer(new Sprite(texture2)));
+		obj1.addComponent(new SpriteRenderer(new Vector4f(1f,0f,1f,0.9f)));
 		this.addGameObjectToScene(obj1);
+		this.activeGameObject = obj1;
 		
 		obj2 = new GameObject("Object 2", 
 				new Transform(new Vector2f(400,100), new Vector2f(64, 64)), 0);
@@ -99,11 +102,18 @@ public class LevelEditorScene extends Scene {
 		for (GameObject go : this.gameObjects)
 		{
 			go.update(dt);
-		}
+		}	
 		
 		this.renderer.render();
 	}
 
+	@Override
+	public void imgui()
+	{
+		ImGui.begin("New Window");
+		ImGui.text("some text");
+		ImGui.end();
+	}
 	
 	
 }

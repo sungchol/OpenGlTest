@@ -3,6 +3,7 @@ package jade;
 import java.util.ArrayList;
 import java.util.List;
 
+import imgui.ImGui;
 import renderer.Renderer;
 
 public abstract class Scene {
@@ -11,6 +12,7 @@ public abstract class Scene {
 	protected Camera camera;
 	private boolean isRunning = false;
 	protected List<GameObject> gameObjects = new ArrayList<>();
+	protected GameObject activeGameObject = null;
 	
 	public Scene() {
 		renderer = new Renderer();
@@ -43,7 +45,20 @@ public abstract class Scene {
 		return this.camera;
 	}
 	
+	public void sceneImgui() {
+		if(activeGameObject != null) {
+			ImGui.begin("Inspector");
+				//run the component imgui 
+				activeGameObject.imgui();
+			ImGui.end();	
+		}
+		
+		imgui();
+	}
 	
+	public void imgui() {
+		//create custom Gui Window : override
+	}
 	
 	
 }

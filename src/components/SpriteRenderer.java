@@ -3,6 +3,7 @@ package components;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import imgui.ImGui;
 import jade.Component;
 import jade.Transform;
 import renderer.Texture;
@@ -44,6 +45,16 @@ public class SpriteRenderer extends Component {
 		}
 	}
 
+	@Override
+	public void imgui() {
+		float[] imColor = {this.color.x, this.color.y, this.color.z, this.color.w };
+		if(ImGui.colorPicker4("Color : ", imColor)) {
+			this.color.set(imColor);
+			this.isDirty = true;
+		}
+	}
+	
+	
 	public Vector4f getColor() {
 		return this.color;
 	}
@@ -78,4 +89,14 @@ public class SpriteRenderer extends Component {
 	public void setClean() {
 		this.isDirty = false;
 	}
+	
+
+	
 }
+
+
+
+
+
+
+

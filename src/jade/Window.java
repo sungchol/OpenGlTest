@@ -31,6 +31,8 @@ public class Window {
 	private String title;
 	private static Window window = null;
 	private long glfwWindow = 0L;
+	private ImGuiLayer imguiLayer;
+	
 	public float r, g, b, a;
 	private boolean fadeToBlack = false;
 	
@@ -130,10 +132,10 @@ public class Window {
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
-//        glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) -> {
-//        	Window.setWidth(newWidth);
-//        	Window.setHeight(newHeight);
-//        });
+        glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) -> {
+        	Window.setWidth(newWidth);
+        	Window.setHeight(newHeight);
+        });
 
         // Make the OpenGL context current
         GLFW.glfwMakeContextCurrent(glfwWindow);
@@ -167,13 +169,15 @@ public class Window {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        
 //
 //        //this.framebuffer = new Framebuffer(3840, 2160);
 //        //this.pickingTexture = new PickingTexture(3840, 2160);
 //        GL.glViewport(0, 0, 3840, 2160);
 //
 //        this.imguiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
-//        this.imguiLayer.initImGui();
+        this.imguiLayer = new ImGuiLayer(glfwWindow);
+        this.imguiLayer.initImGui();
 //
 //        Window.changeScene(new LevelEditorSceneInitializer());
         changeScene(0);
@@ -195,13 +199,31 @@ public class Window {
 			 glClearColor(r, g, b, a);
 			 glClear(GL_COLOR_BUFFER_BIT);
 			 
-			 if(dt>=0)
+			 if(dt>=0) {
 				 currentScene.update(dt);
+			 }
+			 
+			 this.imguiLayer.update(dt, currentScene);
 			 
 			 glfwSwapBuffers(glfwWindow);
 			 endTime = (float) GLFW.glfwGetTime(); //Time.getTime();
 			 dt = endTime - beginTime;
 			 beginTime = endTime;
 		 }
+	}
+	
+	public static int getWidth() {
+		return get().width;
+	}
+	public static int getHeight() {
+		return get().height;
+	}
+	
+	public static void setWidth(int width) {
+		get().width = width;
+	}
+	
+	public static void setHeight(int height) {
+		get().height	 = height;
 	}
 }
