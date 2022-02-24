@@ -10,27 +10,29 @@ import renderer.Texture;
 
 public class SpriteRenderer extends Component {
 
-	private Vector4f color;
+	private Vector4f color = new Vector4f(1,1,1,1);
 	//private Vector2f[] texCoords;
 	//private Texture texture;
-	private Sprite sprite;
-	private Transform lastTransform;
-	private boolean isDirty = false;
+	private Sprite sprite = new Sprite();
 	
-	public SpriteRenderer(Vector4f color) {
-		this.color = color;
-		//this.texture = null;
-		this.sprite = new Sprite(null);
-		this.isDirty = true;	
-	}
+	//transient -> Gson do not serialize
+	private transient Transform lastTransform; 
+	private transient boolean isDirty = false;
 	
-	public SpriteRenderer(Sprite sprite) {
-		this.color = new Vector4f(1,1,1,1);
-		//this.texture = null;
-		this.sprite = sprite;
-		this.isDirty = true;
-		
-	}
+//	public SpriteRenderer(Vector4f color) {
+//		this.color = color;
+//		//this.texture = null;
+//		this.sprite = new Sprite(null);
+//		this.isDirty = true;	
+//	}
+//	
+//	public SpriteRenderer(Sprite sprite) {
+//		this.color = new Vector4f(1,1,1,1);
+//		//this.texture = null;
+//		this.sprite = sprite;
+//		this.isDirty = true;
+//		
+//	}
 	@Override
 	public void start() {
 		this.lastTransform = gameObject.transform.copy();
