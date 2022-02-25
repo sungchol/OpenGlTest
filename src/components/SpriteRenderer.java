@@ -17,7 +17,11 @@ public class SpriteRenderer extends Component {
 	
 	//transient -> Gson do not serialize
 	private transient Transform lastTransform; 
-	private transient boolean isDirty = false;
+	private transient boolean isDirty = true;
+	
+	public int number = 3;
+	public Vector4f position = new Vector4f(1,1,1,1);
+	
 	
 //	public SpriteRenderer(Vector4f color) {
 //		this.color = color;
@@ -54,6 +58,8 @@ public class SpriteRenderer extends Component {
 			this.color.set(imColor);
 			this.isDirty = true;
 		}
+		
+		super.imgui();
 	}
 	
 	

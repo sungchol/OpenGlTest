@@ -5,6 +5,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import java.util.Arrays;
 
+import org.joml.Vector4f;
+
 public class MouseListener {
     private static MouseListener instance;
     private double scrollX, scrollY;
@@ -98,6 +100,28 @@ public class MouseListener {
         return (float)get().yPos;
     }
 
+    public static float getOrthoX() {
+    	float currentX = getX();
+    	currentX = (currentX / (float)Window.getWidth()) * 2f -1f; 
+    	Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
+    	tmp.mul(Window.getScene().camera().getInverseProjection())
+    	   .mul(Window.getScene().camera().getInverseView());
+    	currentX = tmp.x;
+    	//System.out.println(currentX);
+    	return currentX;
+    }
+    
+    public static float getOrthoY() {
+    	float currentY = getY();
+    	currentY = (currentY / (float)Window.getHeight()) * 2f -1f ; 
+    	Vector4f tmp = new Vector4f(0, currentY, 0, 1);
+    	tmp.mul(Window.getScene().camera().getInverseProjection())
+    	   .mul(Window.getScene().camera().getInverseView());
+    	currentY = tmp.y;
+    	//System.out.println(currentY);
+    	return currentY;
+    }
+    
     public static float getWorldDx() {
         return (float)(get().lastWorldX - get().worldX);
     }
