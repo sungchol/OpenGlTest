@@ -18,11 +18,24 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
+
+import static org.lwjgl.opengl.GL15.*;
+
+import Scenes.LevelEditorScene;
+import Scenes.LevelScene;
+import Scenes.Scene;
+
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL.*;
 
 import static org.lwjgl.glfw.GLFW.*;
+
+import renderer.DebugDraw;
+import renderer.Framebuffer;
+import renderer.PickingTexture;
+import renderer.Renderer;
 import renderer.Shader;
+import util.AssetPool;
 import util.Time;
 
 public class Window {
@@ -32,6 +45,8 @@ public class Window {
 	private static Window window = null;
 	private long glfwWindow = 0L;
 	private ImGuiLayer imguiLayer;
+	private Framebuffer framebuffer;
+	private PickingTexture pickingTexture;
 	
 	public float r, g, b, a;
 	private boolean fadeToBlack = false;
@@ -173,11 +188,16 @@ public class Window {
 //
 //        //this.framebuffer = new Framebuffer(3840, 2160);
 //        //this.pickingTexture = new PickingTexture(3840, 2160);
-//        GL.glViewport(0, 0, 3840, 2160);
+        
 //
 //        this.imguiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
         this.imguiLayer = new ImGuiLayer(glfwWindow);
         this.imguiLayer.initImGui();
+        
+        this.framebuffer = new Framebuffer(3840, 2160);
+        this.pickingTexture = new PickingTexture(3840, 2160);
+        
+        glViewport(0, 0, 3840, 2160);
 //
 //        Window.changeScene(new LevelEditorSceneInitializer());
         changeScene(0);
@@ -189,18 +209,53 @@ public class Window {
 		float endTime;
 		float dt = -1.0f;
 		
-		
+		Shader defaultShader = AssetPool.getShader("asset/shaders/default.glsl");
+		Shader pickingShader = AssetPool.getShader("asset/shaders/pickingShader.glsl");
 		
 		while (!glfwWindowShouldClose(glfwWindow)) {
 	            	            
 			 glfwPollEvents();
 
+			 //Render pass 1. Render a Picking texture
+			 glDisable(GL_BLEND); //순수한 픽셀데이터만 가질려고 끔
+			 pickingTexture.enableWriting();
+			 
+			 glViewport(0,0,3840,2160);
+			 glClearColor(0f,0f,0f,0f);
+			 glClear(GL_COLOR_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+			 
+			 Renderer.bindShader(pickingShader);
+			 //Renderer.bindShader(defaultShader);
+			 currentScene.render();
+			 
+			 if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+			 {
+				 int x = (int) MouseListener.getScreenX();
+				 int y = (int) MouseListener.getScreenY();
+				 System.out.println("[window 235 pickingTexture : ]" + pickingTexture.readPixel(x,y) + " x :" + x + " y: " + y);
+			 }
+			 
+			 pickingTexture.disableWriting();
+			 glDisable(GL_BLEND);
+			 
+			 
+			 //Render pass 2. Render actual Game
+			 
+			 
+			 DebugDraw.beginFrame();
+			 
+			 this.framebuffer.bind();	
 			 glClearColor(r, g, b, a);
 			 glClear(GL_COLOR_BUFFER_BIT);
 			 
+			 
 			 if(dt>=0) {
+				 DebugDraw.draw();
+				 Renderer.bindShader(defaultShader);
 				 currentScene.update(dt);
+				 currentScene.render();
 			 }
+			 this.framebuffer.unbind();
 			 
 			 this.imguiLayer.update(dt, currentScene);
 			 
@@ -225,6 +280,23 @@ public class Window {
 	}
 	
 	public static void setHeight(int height) {
-		get().height	 = height;
+		get().height = height;
+	}
+	
+	public static Framebuffer getFramebuffer() {
+		return get().framebuffer;
+	}
+	
+	public static float getTargetAspectRatio() {
+		//return get().width / get().height;
+		return 16.0f / 9.0f;
 	}
 }
+
+
+
+
+
+
+
+

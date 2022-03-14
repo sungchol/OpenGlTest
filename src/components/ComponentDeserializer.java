@@ -1,4 +1,4 @@
-package jade;
+package components;
 
 import java.lang.reflect.Type;
 

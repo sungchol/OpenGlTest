@@ -38,12 +38,16 @@ public class RenderBatch implements Comparable<RenderBatch>{
 	private final int COLOR_SIZE = 4;
 	private final int TEX_COORDS_SIZE = 2;
 	private final int TEX_ID_SIZE = 1;
+	private final int ENTITY_ID_SIZE = 1;
 	
 	private final int POS_OFFSET = 0;
 	private final int COLOR_OFFSET = POS_OFFSET + POS_SIZE * Float.BYTES;
 	private final int TEX_COORDS_OFFSET = COLOR_OFFSET + COLOR_SIZE * Float.BYTES;
 	private final int TEX_ID_OFFSET = TEX_COORDS_OFFSET + TEX_COORDS_SIZE * Float.BYTES;
-	private final int VERTEX_SIZE = POS_SIZE + COLOR_SIZE + TEX_COORDS_SIZE + TEX_ID_SIZE;
+	private final int ENTITY_ID_OFFSET = TEX_ID_OFFSET + ENTITY_ID_SIZE * Float.BYTES;
+	
+	private final int VERTEX_SIZE = POS_SIZE + COLOR_SIZE + TEX_COORDS_SIZE 
+									+ TEX_ID_SIZE + ENTITY_ID_OFFSET;
 	private final int VERTEX_SIZE_BYTES = VERTEX_SIZE * Float.BYTES;
 	
 	private SpriteRenderer[] sprites;
@@ -54,14 +58,14 @@ public class RenderBatch implements Comparable<RenderBatch>{
 	
 	private List<Texture> textures;
 	private int vaoId, vboId, maxBatchSize;
-	private Shader shader;
+	//private Shader shader;
 	private int zIndex;
 	
 	public RenderBatch(int maxBatchSize, int zIndex) {
 		//shader = new Shader("asset/shaders/default.glsl");
 		//shader.compile();
 		System.out.println("Create new renderBatch");
-		shader = AssetPool.getShader("asset/shaders/default.glsl");
+		//shader = AssetPool.getShader("asset/shaders/default.glsl");
 		
 		this.zIndex = zIndex;
 		this.sprites = new SpriteRenderer[maxBatchSize];
@@ -101,6 +105,9 @@ public class RenderBatch implements Comparable<RenderBatch>{
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(3, TEX_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEX_ID_OFFSET);
 		glEnableVertexAttribArray(3);
+		
+		glVertexAttribPointer(4, ENTITY_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, ENTITY_ID_OFFSET);
+		glEnableVertexAttribArray(4);
 	}
 	
 	public void addSprite(SpriteRenderer spr) {
@@ -138,7 +145,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
 		int texId = 0;
 		if(sprite.getTexture() != null) {
 			for(int i=0; i<textures.size(); i++) {
-				if(textures.get(i) == sprite.getTexture()) {
+				if(textures.get(i).equals(sprite.getTexture())) {
 					texId = i+1;
 				}
 			}
@@ -179,6 +186,10 @@ public class RenderBatch implements Comparable<RenderBatch>{
 			//Load tex ID
 			vertices[offset + 8 ] = texId;
 			
+			//Load entity id
+			vertices[offset + 9] = sprite.gameObject.getuid() + 1;
+			System.out.println("[RenderBatch 191]" + sprite.gameObject.getuid() + " " + 
+					sprite.getuid());
 			
 			offset += VERTEX_SIZE;
 		}
@@ -206,7 +217,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
 		}
 		
 		//User shader
-		shader.use();
+		Shader shader = Renderer.getBoundShader();
 		shader.uploadMat4f("uProjection", Window.getScene().camera().getProjectionMatrix());
 		shader.uploadMat4f("uView", Window.getScene().camera().getViewMatrix());
 		//active texture slot And Bind

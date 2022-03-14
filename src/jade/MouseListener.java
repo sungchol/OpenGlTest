@@ -5,6 +5,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import java.util.Arrays;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 public class MouseListener {
@@ -16,8 +18,8 @@ public class MouseListener {
 
     private int mouseButtonDown = 0;
 
-//    private Vector2f gameViewportPos = new Vector2f();
-//    private Vector2f gameViewportSize = new Vector2f();
+    private Vector2f gameViewportPos = new Vector2f();
+    private Vector2f gameViewportSize = new Vector2f();
 
     private MouseListener() {
         this.scrollX = 0.0;
@@ -101,22 +103,30 @@ public class MouseListener {
     }
 
     public static float getOrthoX() {
-    	float currentX = getX();
-    	currentX = (currentX / (float)Window.getWidth()) * 2f -1f; 
+    	float currentX = getX() - get().gameViewportPos.x;
+    	currentX = (currentX / get().gameViewportSize.x) * 2f -1f; 
     	Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
-    	tmp.mul(Window.getScene().camera().getInverseProjection())
-    	   .mul(Window.getScene().camera().getInverseView());
+    	
+    	Camera camera = Window.getScene().camera();
+    	Matrix4f viewProjection = new Matrix4f();
+    	camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
+    	
+    	tmp.mul(viewProjection);
     	currentX = tmp.x;
     	//System.out.println(currentX);
     	return currentX;
     }
     
     public static float getOrthoY() {
-    	float currentY = getY();
-    	currentY = (currentY / (float)Window.getHeight()) * 2f -1f ; 
+    	//float currentY = Window.getHeight() - getY();
+    	float currentY = getY() - get().gameViewportPos.y;
+    	currentY = -((currentY / get().gameViewportSize.y) * 2f -1f ); 
     	Vector4f tmp = new Vector4f(0, currentY, 0, 1);
-    	tmp.mul(Window.getScene().camera().getInverseProjection())
-    	   .mul(Window.getScene().camera().getInverseView());
+    	
+    	Camera camera = Window.getScene().camera();
+    	Matrix4f viewProjection = new Matrix4f();
+    	camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
+    	tmp.mul(viewProjection);
     	currentY = tmp.y;
     	//System.out.println(currentY);
     	return currentY;
@@ -146,75 +156,77 @@ public class MouseListener {
         }
     }
 
-//    public static float getWorldX() {
-//        return getWorld().x;
-//    }
-//
-//    public static float getWorldY() {
-//        return getWorld().y;
-//    }
-//
-//    public static Vector2f getWorld() {
-//        float currentX = getX() - get().gameViewportPos.x;
-//        currentX = (2.0f * (currentX / get().gameViewportSize.x)) - 1.0f;
-//        float currentY = (getY() - get().gameViewportPos.y);
-//        currentY = (2.0f * (1.0f - (currentY / get().gameViewportSize.y))) - 1;
-//
-//        Camera camera = Window.getScene().camera();
-//        Vector4f tmp = new Vector4f(currentX, currentY, 0, 1);
-//        Matrix4f inverseView = new Matrix4f(camera.getInverseView());
-//        Matrix4f inverseProjection = new Matrix4f(camera.getInverseProjection());
-//        tmp.mul(inverseView.mul(inverseProjection));
-//        return new Vector2f(tmp.x, tmp.y);
-//    }
-//
-//    public static Vector2f screenToWorld(Vector2f screenCoords) {
-//        Vector2f normalizedScreenCords = new Vector2f(
-//                screenCoords.x / Window.getWidth(),
-//                screenCoords.y / Window.getHeight()
-//        );
-//        normalizedScreenCords.mul(2.0f).sub(new Vector2f(1.0f, 1.0f));
-//        Camera camera = Window.getScene().camera();
-//        Vector4f tmp = new Vector4f(normalizedScreenCords.x, normalizedScreenCords.y,
-//                0, 1);
-//        Matrix4f inverseView = new Matrix4f(camera.getInverseView());
-//        Matrix4f inverseProjection = new Matrix4f(camera.getInverseProjection());
-//        tmp.mul(inverseView.mul(inverseProjection));
-//        return new Vector2f(tmp.x, tmp.y);
-//    }
-//
-//    public static Vector2f worldToScreen(Vector2f worldCoords) {
-//        Camera camera = Window.getScene().camera();
-//        Vector4f ndcSpacePos = new Vector4f(worldCoords.x, worldCoords.y, 0, 1);
-//        Matrix4f view = new Matrix4f(camera.getViewMatrix());
-//        Matrix4f projection = new Matrix4f(camera.getProjectionMatrix());
-//        ndcSpacePos.mul(projection.mul(view));
-//        Vector2f windowSpace = new Vector2f(ndcSpacePos.x, ndcSpacePos.y).mul(1.0f / ndcSpacePos.w);
-//        windowSpace.add(new Vector2f(1.0f, 1.0f)).mul(0.5f);
-//        windowSpace.mul(new Vector2f(Window.getWidth(), Window.getHeight()));
-//
-//        return windowSpace;
-//    }
-//
-//    public static float getScreenX() {
-//        return getScreen().x;
-//    }
-//
-//    public static float getScreenY() {
-//        return getScreen().y;
-//    }
-//
-//    public static Vector2f getScreen() {
-//        float currentX = getX() - get().gameViewportPos.x;
-//        currentX = (currentX / get().gameViewportSize.x) * 3840.0f;
-//        float currentY = (getY() - get().gameViewportPos.y);
-//        currentY = (1.0f - (currentY / get().gameViewportSize.y)) * 2160.0f;
-//        return new Vector2f(currentX, currentY);
-//    }
-//
-//    public static void setGameViewportPos(Vector2f gameViewportPos) { get().gameViewportPos.set(gameViewportPos); }
-//
-//    public static void setGameViewportSize(Vector2f gameViewportSize) {
-//        get().gameViewportSize.set(gameViewportSize);
-//    }
+    public static float getWorldX() {
+        return getWorld().x;
+    }
+
+    public static float getWorldY() {
+        return getWorld().y;
+    }
+
+    public static Vector2f getWorld() {
+        float currentX = getX() - get().gameViewportPos.x;
+        currentX = (2.0f * (currentX / get().gameViewportSize.x)) - 1.0f;
+        float currentY = (getY() - get().gameViewportPos.y);
+        currentY = (2.0f * (1.0f - (currentY / get().gameViewportSize.y))) - 1;
+
+        Camera camera = Window.getScene().camera();
+        Vector4f tmp = new Vector4f(currentX, currentY, 0, 1);
+        Matrix4f inverseView = new Matrix4f(camera.getInverseView());
+        Matrix4f inverseProjection = new Matrix4f(camera.getInverseProjection());
+        tmp.mul(inverseView.mul(inverseProjection));
+        return new Vector2f(tmp.x, tmp.y);
+    }
+
+    public static Vector2f screenToWorld(Vector2f screenCoords) {
+        Vector2f normalizedScreenCords = new Vector2f(
+                screenCoords.x / Window.getWidth(),
+                screenCoords.y / Window.getHeight()
+        );
+        normalizedScreenCords.mul(2.0f).sub(new Vector2f(1.0f, 1.0f));
+        Camera camera = Window.getScene().camera();
+        Vector4f tmp = new Vector4f(normalizedScreenCords.x, normalizedScreenCords.y,
+                0, 1);
+        Matrix4f inverseView = new Matrix4f(camera.getInverseView());
+        Matrix4f inverseProjection = new Matrix4f(camera.getInverseProjection());
+        tmp.mul(inverseView.mul(inverseProjection));
+        return new Vector2f(tmp.x, tmp.y);
+    }
+
+    public static Vector2f worldToScreen(Vector2f worldCoords) {
+        Camera camera = Window.getScene().camera();
+        Vector4f ndcSpacePos = new Vector4f(worldCoords.x, worldCoords.y, 0, 1);
+        Matrix4f view = new Matrix4f(camera.getViewMatrix());
+        Matrix4f projection = new Matrix4f(camera.getProjectionMatrix());
+        ndcSpacePos.mul(projection.mul(view));
+        Vector2f windowSpace = new Vector2f(ndcSpacePos.x, ndcSpacePos.y).mul(1.0f / ndcSpacePos.w);
+        windowSpace.add(new Vector2f(1.0f, 1.0f)).mul(0.5f);
+        windowSpace.mul(new Vector2f(Window.getWidth(), Window.getHeight()));
+
+        return windowSpace;
+    }
+
+    public static float getScreenX() {
+        return getScreen().x;
+    }
+
+    public static float getScreenY() {
+        return getScreen().y;
+    }
+
+    public static Vector2f getScreen() {
+        float currentX = getX() - get().gameViewportPos.x;
+        currentX = (currentX / get().gameViewportSize.x) * 3840.0f;
+        float currentY = (getY() - get().gameViewportPos.y);
+        currentY = (1.0f - (currentY / get().gameViewportSize.y)) * 2160.0f;
+        return new Vector2f(currentX, currentY);
+    }
+
+    public static void setGameViewportPos(Vector2f gameViewportPos) { 
+    	get().gameViewportPos.set(gameViewportPos); 
+    }
+
+    public static void setGameViewportSize(Vector2f gameViewportSize) {
+        get().gameViewportSize.set(gameViewportSize);
+    }
 }
