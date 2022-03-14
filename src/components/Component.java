@@ -1,4 +1,4 @@
-package jade;
+package components;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -7,8 +7,12 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import imgui.ImGui;
+import jade.GameObject;
 
 public abstract class Component {
+	private static int ID_COUNTER = 0;
+	private int uid = -1;
+	
 	
 	public transient GameObject gameObject = null;
 	
@@ -84,4 +88,18 @@ public abstract class Component {
 		}
 	}
 	
+	public void generateId()
+	{
+		if(this.uid == -1) {
+			this.uid = ID_COUNTER++;	
+		}
+	}
+	
+	public int getuid() {
+		return this.uid;
+	}
+	
+	public static void init(int maxId) {
+		ID_COUNTER = maxId;
+	}
 }

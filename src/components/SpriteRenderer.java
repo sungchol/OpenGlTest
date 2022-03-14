@@ -4,7 +4,6 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import imgui.ImGui;
-import jade.Component;
 import jade.Transform;
 import renderer.Texture;
 
@@ -98,7 +97,9 @@ public class SpriteRenderer extends Component {
 		this.isDirty = false;
 	}
 	
-
+	public void setTexture(Texture texture) {
+		this.sprite.setTexture(texture);
+	}
 	
 }
 

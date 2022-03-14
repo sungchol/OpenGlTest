@@ -1,4 +1,4 @@
-package jade;
+package Scenes;
 
 import java.awt.event.KeyEvent;
 
@@ -14,7 +14,13 @@ public class LevelScene extends Scene {
 		
 			
 	}
-
+	
+	@Override
+	public void render() {
+		
+			
+	}
+	
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
