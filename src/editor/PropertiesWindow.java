@@ -5,12 +5,16 @@ import components.SpriteRenderer;
 import imgui.ImGui;
 import jade.GameObject;
 import jade.MouseListener;
+import renderer.PickingTexture;
+
 import org.joml.Vector4f;
 //import physics2d.components.Box2DCollider;
 //import physics2d.components.CircleCollider;
 //import physics2d.components.Rigidbody2D;
 //import renderer.PickingTexture;
 //import scenes.Scene;
+
+import Scenes.Scene;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +25,40 @@ public class PropertiesWindow {
     private List<GameObject> activeGameObjects;
     private List<Vector4f> activeGameObjectsOgColor;
     private GameObject activeGameObject = null;
-//    private PickingTexture pickingTexture;
+    private PickingTexture pickingTexture;
 
-    public PropertiesWindow() //PickingTexture pickingTexture) {
+    public void update(float dt, Scene currentScene)
+    {
+    	 if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+		 {
+			 int x = (int) MouseListener.getScreenX();
+			 int y = (int) MouseListener.getScreenY();
+			 System.out.println("[PropertiesWindow 36 pickingTexture : ]" 
+					 	+ pickingTexture.readPixel(x,y) + " x :" + x + " y: " + y);
+			 int gameObjectId = pickingTexture.readPixel(x,y);
+			 activeGameObject = currentScene.getGameObject(gameObjectId);
+		 }
+    }
+    
+    public PropertiesWindow(PickingTexture pickingTexture) 
     {
         this.activeGameObjects = new ArrayList<>();
-        //this.pickingTexture = pickingTexture;
+        this.pickingTexture = pickingTexture;
         this.activeGameObjectsOgColor = new ArrayList<>();
     }
 
     public void imgui() {
+    	
+    	if(activeGameObject != null) 
+    	{
+    		ImGui.begin("hihi");
+    		activeGameObject.imgui();
+    		ImGui.end();
+    	}
+    	
         if (activeGameObjects.size() == 1 && activeGameObjects.get(0) != null) {
             activeGameObject = activeGameObjects.get(0);
+            
             ImGui.begin("Properties");
 
             if (ImGui.beginPopupContextWindow("ComponentAdder")) {

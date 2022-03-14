@@ -191,11 +191,12 @@ public class Window {
         
 //
 //        this.imguiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
-        this.imguiLayer = new ImGuiLayer(glfwWindow);
-        this.imguiLayer.initImGui();
         
         this.framebuffer = new Framebuffer(3840, 2160);
         this.pickingTexture = new PickingTexture(3840, 2160);
+        
+        this.imguiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
+        this.imguiLayer.initImGui();
         
         glViewport(0, 0, 3840, 2160);
 //
@@ -228,12 +229,7 @@ public class Window {
 			 //Renderer.bindShader(defaultShader);
 			 currentScene.render();
 			 
-			 if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
-			 {
-				 int x = (int) MouseListener.getScreenX();
-				 int y = (int) MouseListener.getScreenY();
-				 System.out.println("[window 235 pickingTexture : ]" + pickingTexture.readPixel(x,y) + " x :" + x + " y: " + y);
-			 }
+			
 			 
 			 pickingTexture.disableWriting();
 			 glDisable(GL_BLEND);

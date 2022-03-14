@@ -53,13 +53,13 @@ public class LevelEditorScene extends Scene {
 		texture = AssetPool.getTexture("asset/images/blendImage1.png");
 		sprites = AssetPool.getSpritesheet("asset/images/spritesheets/decorationsAndBlocks.png");
 		
-		if(levelLoaded) {
-			if(gameObjects.size() > 0)
-			{
-				this.activeGameObject = gameObjects.get(0);				
-			}
-			return;
-		}
+//		if(levelLoaded) {
+//			if(gameObjects.size() > 0)
+//			{
+//				this.activeGameObject = gameObjects.get(0);				
+//			}
+//			return;
+//		}
 		
 	}
 
